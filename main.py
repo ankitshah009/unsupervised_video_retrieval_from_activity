@@ -21,12 +21,13 @@ from utils import Logger
 from train import train_epoch
 from validation import val_epoch
 import test
-import numpy as np
 from tensorboardX import SummaryWriter
+import random
 
 # ----------------------------------------------
 np.random.seed(0)
 torch.manual_seed(0)
+random.seed(0)
 # ----------------------------------------------
 if __name__ == '__main__':
     opt = parse_opts()
