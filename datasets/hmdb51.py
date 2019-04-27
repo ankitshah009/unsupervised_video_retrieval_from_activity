@@ -6,6 +6,7 @@ import math
 import functools
 import json
 import copy
+import random
 
 from utils import load_value_file
 
@@ -170,6 +171,34 @@ class HMDB51(data.Dataset):
         self.target_transform = target_transform
         self.loader = get_loader()
 
+    # def __getitem__(self, index):
+    #     """
+    #     Args:
+    #         index (int): Index
+    #     Returns:
+    #         tuple: (image, target) where target is class_index of the target class.
+    #     """
+    #     path = self.data[index]['video']
+
+    #     frame_indices = self.data[index]['frame_indices']
+    #     if self.temporal_transform is not None:
+    #         frame_indices = self.temporal_transform(frame_indices)
+    #     clip = self.loader(path, frame_indices)
+    #     if self.spatial_transform is not None:
+    #         self.spatial_transform.randomize_parameters()
+    #         clip = [self.spatial_transform(img) for img in clip]
+    #     clip = torch.stack(clip, 0).permute(1, 0, 2, 3)
+
+    #     target = self.data[index]
+    #     if self.target_transform is not None:
+    #         target = self.target_transform(target)
+
+
+    #     import pdb; pdb.set_trace()
+
+    #     return clip, target
+
+    # ---------------------------------------------------------------
     def __getitem__(self, index):
         """
         Args:
@@ -192,7 +221,42 @@ class HMDB51(data.Dataset):
         if self.target_transform is not None:
             target = self.target_transform(target)
 
-        return clip, target
+        # ---------------------------
+        import pdb; pdb.set_trace()
+        time = clip.size(1)
+        anchor_clip = clip[:, :time//2, :, :]
+        positive_clip = clip[:, time//2:, :, :]
+
+        # -------------------------
+        while True:
+            negative_index = random.randint(0, len(self.data))
+            if index != negative_index:
+                break
+
+        #get negative clip
+        negative_path = self.data[negative_index]['video']
+
+        negative_frame_indices = self.data[negative_index]['frame_indices']
+        if self.temporal_transform is not None:
+            negative_frame_indices = self.temporal_transform(negative_frame_indices)
+        negative_clip = self.loader(negative_path, negative_frame_indices)
+        if self.spatial_transform is not None:
+            self.spatial_transform.randomize_parameters()
+            negative_clip = [self.spatial_transform(negative_img) for negative_img in negative_clip]
+        negative_clip = torch.stack(negative_clip, 0).permute(1, 0, 2, 3)
+
+        negative_target = self.data[negative_index]
+        if self.target_transform is not None:
+            negative_target = self.target_transform(negative_target)
+        
+        if random.randint(0, 1) == 0:
+            negative_clip = negative_clip[:, :time//2, :, :]
+        else:
+            negative_clip = negative_clip[:, time//2:, :, :]
+        # -------------------------
+
+        return clip, target, anchor_clip, positive_clip, negative_clip, negative_target
+    # ---------------------------------------------------------------
 
     def __len__(self):
         return len(self.data)
