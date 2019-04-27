@@ -6,7 +6,7 @@ import sys
 from utils import AverageMeter, calculate_accuracy
 
 
-def val_epoch(epoch, data_loader, model, criterion, opt, logger):
+def val_epoch(epoch, data_loader, model, criterion, opt, logger, tb_logger):
     print('validation at epoch {}'.format(epoch))
 
     model.eval()
@@ -48,6 +48,8 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
                   loss=losses,
                   acc=accuracies))
 
+    tb_logger.add_scalar('val/loss', losses.avg, epoch)
+    tb_logger.add_scalar('val/acc', accuracies.avg, epoch)
     logger.log({'epoch': epoch, 'loss': losses.avg, 'acc': accuracies.avg})
 
     return losses.avg

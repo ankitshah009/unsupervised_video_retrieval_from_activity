@@ -22,6 +22,8 @@ from train import train_epoch
 from validation import val_epoch
 import test
 import numpy as np
+from tensorboardX import SummaryWriter
+
 # ----------------------------------------------
 np.random.seed(0)
 torch.manual_seed(0)
@@ -52,6 +54,7 @@ if __name__ == '__main__':
     if not opt.no_cuda:
         criterion = criterion.cuda()
 
+    tb_logger = SummaryWriter(opt.result_path)
     if opt.no_mean_norm and not opt.std_norm:
         norm_method = Normalize([0, 0, 0], [1, 1, 1])
     elif not opt.std_norm:
@@ -136,10 +139,10 @@ if __name__ == '__main__':
     for i in range(opt.begin_epoch, opt.n_epochs + 1):
         if not opt.no_train:
             train_epoch(i, train_loader, model, criterion, optimizer, opt,
-                        train_logger, train_batch_logger)
+                        train_logger, train_batch_logger, tb_logger)
         if not opt.no_val:
             validation_loss = val_epoch(i, val_loader, model, criterion, opt,
-                                        val_logger)
+                                        val_logger, tb_logger)
 
         if not opt.no_train and not opt.no_val:
             scheduler.step(validation_loss)
