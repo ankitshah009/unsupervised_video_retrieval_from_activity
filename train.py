@@ -8,7 +8,7 @@ from utils import AverageMeter, calculate_accuracy
 
 
 def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
-                epoch_logger, batch_logger):
+                epoch_logger, batch_logger, tb_logger):
     print('train at epoch {}'.format(epoch))
 
     model.train()
@@ -21,6 +21,7 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
     end_time = time.time()
     for i, (inputs, targets, anchor_inputs, positive_inputs, negative_inputs, negative_targets) in enumerate(data_loader):
         data_time.update(time.time() - end_time)
+        itr = (epoch - 1) * len(data_loader) + (i + 1)
 
         if not opt.no_cuda:
             targets = targets.cuda(async=True)
@@ -39,6 +40,7 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
         triplet_loss = triplet_losses.mean()
         
         loss = triplet_loss
+        tb_logger.add_scalar('train/triplet_loss', loss, itr)
         # ----------------------------------------------
         outputs, features = model(inputs)
         # loss = criterion(outputs, targets)
@@ -46,6 +48,7 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
 
         losses.update(loss.item(), inputs.size(0))
         accuracies.update(acc, inputs.size(0))
+        tb_logger.add_scalar('train/acc', accuracies.val, itr)
 
         optimizer.zero_grad()
         loss.backward()
@@ -57,7 +60,7 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
         batch_logger.log({
             'epoch': epoch,
             'batch': i + 1,
-            'iter': (epoch - 1) * len(data_loader) + (i + 1),
+            'iter': itr,
             'loss': losses.val,
             'acc': accuracies.val,
             'lr': optimizer.param_groups[0]['lr']
