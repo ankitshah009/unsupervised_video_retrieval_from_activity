@@ -228,16 +228,12 @@ class HMDB51(data.Dataset):
 
         # -------------------------
         while True:
-            negative_index = random.randint(0, len(self.data))
+            negative_index = random.randint(0, len(self.data)-1)
             if index != negative_index:
                 break
-        print('index:{} negative_index:{} len_data:{}'.format(index, negative_index, len(self.data)))
 
         #get negative clip
-        try:
-            negative_path = self.data[negative_index]['video']
-        except:
-            import pdb; pdb.set_trace()
+        negative_path = self.data[negative_index]['video']
 
         negative_frame_indices = self.data[negative_index]['frame_indices']
         if self.temporal_transform is not None:
