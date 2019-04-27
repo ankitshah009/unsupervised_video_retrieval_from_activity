@@ -231,7 +231,7 @@ class HMDB51(data.Dataset):
             negative_index = random.randint(0, len(self.data))
             if index != negative_index:
                 break
-
+        print('index:{} negative_index:{} len_data:{}'.format(index, negative_index, len(self.data)))
         #get negative clip
         negative_path = self.data[negative_index]['video']
 

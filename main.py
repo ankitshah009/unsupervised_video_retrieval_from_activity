@@ -46,8 +46,6 @@ if __name__ == '__main__':
     with open(os.path.join(opt.result_path, 'opts.json'), 'w') as opt_file:
         json.dump(vars(opt), opt_file)
 
-    torch.manual_seed(opt.manual_seed)
-
     model, parameters = generate_model(opt)
     print(model)
     criterion = nn.CrossEntropyLoss()
