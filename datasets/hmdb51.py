@@ -232,8 +232,12 @@ class HMDB51(data.Dataset):
             if index != negative_index:
                 break
         print('index:{} negative_index:{} len_data:{}'.format(index, negative_index, len(self.data)))
+
         #get negative clip
-        negative_path = self.data[negative_index]['video']
+        try:
+            negative_path = self.data[negative_index]['video']
+        except:
+            import pdb; pdb.set_trace()
 
         negative_frame_indices = self.data[negative_index]['frame_indices']
         if self.temporal_transform is not None:
