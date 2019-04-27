@@ -186,10 +186,10 @@ class ResNet(nn.Module):
         x = self.avgpool(x)
 
         x = x.view(x.size(0), -1)
+        feat = x
         x = self.fc(x)
 
-        return x
-
+        return x, feat
 
 def get_fine_tuning_parameters(model, ft_begin_index):
     if ft_begin_index == 0:

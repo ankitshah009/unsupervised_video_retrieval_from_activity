@@ -3,7 +3,7 @@ from torch.autograd import Variable
 import time
 import os
 import sys
-
+import torch.nn.functional as F
 from utils import AverageMeter, calculate_accuracy
 
 
@@ -19,15 +19,29 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
     accuracies = AverageMeter()
 
     end_time = time.time()
-    for i, (inputs, targets) in enumerate(data_loader):
+    for i, (inputs, targets, anchor_inputs, positive_inputs, negative_inputs, negative_targets) in enumerate(data_loader):
         data_time.update(time.time() - end_time)
 
         if not opt.no_cuda:
             targets = targets.cuda(async=True)
         inputs = Variable(inputs)
         targets = Variable(targets)
-        outputs = model(inputs)
-        loss = criterion(outputs, targets)
+
+        # ----------------------------------------------
+        margin = 0.5
+        _, anchor_features = model(anchor_inputs)
+        _, positive_features = model(positive_inputs)
+        _, negative_features = model(negative_inputs)
+
+        distance_positive = (anchor_features - positive_features).pow(2).sum(1)  # .pow(.5)
+        distance_negative = (anchor_features - negative_features).pow(2).sum(1)  # .pow(.5)
+        triplet_losses = F.relu(distance_positive - distance_negative + margin)
+        triplet_loss = triplet_losses.mean()
+        
+        loss = triplet_loss
+        # ----------------------------------------------
+        outputs, features = model(inputs)
+        # loss = criterion(outputs, targets)
         acc = calculate_accuracy(outputs, targets)
 
         losses.update(loss.item(), inputs.size(0))

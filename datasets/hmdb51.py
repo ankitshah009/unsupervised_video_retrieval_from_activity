@@ -222,7 +222,6 @@ class HMDB51(data.Dataset):
             target = self.target_transform(target)
 
         # ---------------------------
-        import pdb; pdb.set_trace()
         time = clip.size(1)
         anchor_clip = clip[:, :time//2, :, :]
         positive_clip = clip[:, time//2:, :, :]
