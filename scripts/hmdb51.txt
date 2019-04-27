@@ -1,0 +1,8 @@
+
+python utils/video_jpg_ucf101_hmdb51.py ../datasets/HMDB51/hmdb51_org ../datasets/HMDB51/hmdb51_jpg
+
+
+python utils/n_frames_ucf101_hmdb51.py ../datasets/HMDB51/hmdb51_jpg
+
+# should generate 3 json files in the same folder
+python utils/hmdb51_json.py ../datasets/HMDB51/testTrainMulti_7030_splits
