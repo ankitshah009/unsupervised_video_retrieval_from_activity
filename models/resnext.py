@@ -110,7 +110,8 @@ class ResNeXt(nn.Module):
             block, 512, layers[2], shortcut_type, cardinality, stride=2)
         self.layer4 = self._make_layer(
             block, 1024, layers[3], shortcut_type, cardinality, stride=2)
-        last_duration = int(math.ceil(sample_duration / 16))
+        half_sample_duration = sample_duration/2
+        last_duration = int(math.ceil(half_sample_duration / 16))
         last_size = int(math.ceil(sample_size / 32))
         self.avgpool = nn.AvgPool3d(
             (last_duration, last_size, last_size), stride=1)
@@ -118,7 +119,7 @@ class ResNeXt(nn.Module):
 
         for m in self.modules():
             if isinstance(m, nn.Conv3d):
-                m.weight = nn.init.kaiming_normal(m.weight, mode='fan_out')
+                m.weight = nn.init.kaiming_normal_(m.weight, mode='fan_out')
             elif isinstance(m, nn.BatchNorm3d):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
@@ -169,9 +170,9 @@ class ResNeXt(nn.Module):
         x = self.avgpool(x)
 
         x = x.view(x.size(0), -1)
+        feat = x
         x = self.fc(x)
-
-        return x
+        return x, feat
 
 
 def get_fine_tuning_parameters(model, ft_begin_index):

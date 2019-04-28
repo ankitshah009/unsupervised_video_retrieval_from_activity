@@ -29,7 +29,8 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
         targets = Variable(targets)
 
         # ----------------------------------------------
-        margin = 0.5
+        # margin = 1.0
+        margin = 300.0
         _, anchor_features = model(anchor_inputs)
         _, positive_features = model(positive_inputs)
         _, negative_features = model(negative_inputs)
@@ -42,9 +43,10 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
         loss = triplet_loss
         tb_logger.add_scalar('train/triplet_loss', loss, itr)
         # ----------------------------------------------
-        outputs, features = model(inputs)
+        # outputs, features = model(anchor_inputs)
         # loss = criterion(outputs, targets)
-        acc = calculate_accuracy(outputs, targets)
+        # acc = calculate_accuracy(outputs, targets)
+        acc = 0.0
 
         losses.update(loss.item(), inputs.size(0))
         accuracies.update(acc, inputs.size(0))

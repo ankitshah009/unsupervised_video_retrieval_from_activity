@@ -25,7 +25,7 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, tb_logger):
         with torch.no_grad():
           inputs = Variable(inputs)
           targets = Variable(targets)
-          outputs, features = model(inputs)
+          outputs, features = model(anchor_inputs)
         loss = criterion(outputs, targets)
         acc = calculate_accuracy(outputs, targets)
 

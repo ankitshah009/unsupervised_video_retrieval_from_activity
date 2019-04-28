@@ -107,8 +107,9 @@ if __name__ == '__main__':
             dampening=dampening,
             weight_decay=opt.weight_decay,
             nesterov=opt.nesterov)
-        scheduler = lr_scheduler.ReduceLROnPlateau(
-            optimizer, 'min', patience=opt.lr_patience)
+        # scheduler = lr_scheduler.ReduceLROnPlateau(
+        #     optimizer, 'min', patience=opt.lr_patience)
+        scheduler = lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.8333)
     if not opt.no_val:
         spatial_transform = Compose([
             Scale(opt.sample_size),
@@ -148,7 +149,8 @@ if __name__ == '__main__':
                                         val_logger, tb_logger)
 
         if not opt.no_train and not opt.no_val:
-            scheduler.step(validation_loss)
+            # scheduler.step(validation_loss)
+            scheduler.step()
 
     if opt.test:
         spatial_transform = Compose([
