@@ -135,7 +135,7 @@ if __name__ == '__main__':
         if not opt.no_train:
             train_epoch(i, train_loader, model, criterion, optimizer, opt,
                         train_logger, train_batch_logger)
-        if not opt.no_val and i%10==0:
+        if not opt.no_val and i%20==0:
             validation_loss = val_epoch(i, val_loader, model, criterion, opt,
                                         val_logger)
 
