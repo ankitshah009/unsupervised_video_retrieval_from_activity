@@ -14,6 +14,6 @@ cd ..
 CUDA_VISIBLE_DEVICES=0,1,2,3 python main.py --root_path ./../data --video_path hmdb/jpg --annotation_path hmdb/hmdb51_1.json \
 --result_path hmdb/results --dataset hmdb51 --model resnet \
 --model_depth 50 --n_classes 51 --batch_size 64 --n_threads 32 --checkpoint 5 \
---n_epochs 25 \
+--n_epochs 50 \
 
 # ----------------------------------------------------------------------------------------------

@@ -163,7 +163,7 @@ def generate_model(opt):
 
     if not opt.no_cuda:
         model = model.cuda()
-        model = nn.DataParallel(model, device_ids=None)
+        model = nn.DataParallel(model, device_ids=range(torch.cuda.device_count()))
 
         if opt.pretrain_path:
             print('loading pretrained model {}'.format(opt.pretrain_path))
