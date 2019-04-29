@@ -5,7 +5,7 @@ import os
 import sys
 import torch.nn.functional as F
 from utils import AverageMeter, calculate_accuracy
-
+import pdb
 
 def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
                 epoch_logger, batch_logger, tb_logger):
@@ -19,6 +19,7 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
     accuracies = AverageMeter()
 
     end_time = time.time()
+
     for i, (inputs, targets, anchor_inputs, positive_inputs, negative_inputs, negative_targets) in enumerate(data_loader):
         data_time.update(time.time() - end_time)
         itr = (epoch - 1) * len(data_loader) + (i + 1)
@@ -30,13 +31,16 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
 
         # ----------------------------------------------
         # margin = 1.0
-        margin = 300.0
+        margin = 0.5
         _, anchor_features = model(anchor_inputs)
         _, positive_features = model(positive_inputs)
         _, negative_features = model(negative_inputs)
-
-        distance_positive = (anchor_features - positive_features).pow(2).sum(1)  # .pow(.5)
-        distance_negative = (anchor_features - negative_features).pow(2).sum(1)  # .pow(.5)
+        anchor_features_normalized= (anchor_features/(torch.norm(anchor_features,p=2,dim=1).unsqueeze(1)))
+        positive_features_normalized=  (positive_features/(torch.norm(positive_features,p=2,dim=1).unsqueeze(1)))
+        negative_features_normalized=  (negative_features/(torch.norm(negative_features,p=2,dim=1).unsqueeze(1)))
+        distance_positive = (anchor_features_normalized - positive_features_normalized).pow(2).sum(1)  # .pow(.5)
+        distance_negative = (anchor_features_normalized - negative_features_normalized).pow(2).sum(1)  # .pow(.5)
+        #pdb.set_trace()
         triplet_losses = F.relu(distance_positive - distance_negative + margin)
         triplet_loss = triplet_losses.mean()
         
