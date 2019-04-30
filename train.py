@@ -5,7 +5,6 @@ import os
 import sys
 import torch.nn.functional as F
 from utils import AverageMeter, calculate_accuracy
-import pdb
 
 def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
                 epoch_logger, batch_logger, tb_logger):
@@ -40,7 +39,6 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
         negative_features_normalized=  (negative_features/(torch.norm(negative_features,p=2,dim=1).unsqueeze(1)))
         distance_positive = (anchor_features_normalized - positive_features_normalized).pow(2).sum(1)  # .pow(.5)
         distance_negative = (anchor_features_normalized - negative_features_normalized).pow(2).sum(1)  # .pow(.5)
-        #pdb.set_trace()
         triplet_losses = F.relu(distance_positive - distance_negative + margin)
         triplet_loss = triplet_losses.mean()
         
