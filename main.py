@@ -83,6 +83,11 @@ if __name__ == '__main__':
         target_transform = ClassLabel()
         training_data = get_training_set(opt, spatial_transform,
                                          temporal_transform, target_transform)
+
+        # todo: temp
+        #subset_indices = np.random.choice(len(training_data), int(0.01 * len(training_data)))
+        #training_data = torch.utils.data.Subset(training_data, subset_indices)
+
         train_loader = torch.utils.data.DataLoader(
             training_data,
             batch_size=opt.batch_size,
@@ -120,6 +125,11 @@ if __name__ == '__main__':
         target_transform = ClassLabel()
         validation_data = get_validation_set(
             opt, spatial_transform, temporal_transform, target_transform)
+        
+        # todo: temp
+        #subset_indices = np.random.choice(len(validation_data), int(0.011 * len(validation_data)))
+        #validation_data = torch.utils.data.Subset(validation_data, subset_indices)
+
         val_loader = torch.utils.data.DataLoader(
             validation_data,
             batch_size=opt.batch_size,
@@ -131,7 +141,7 @@ if __name__ == '__main__':
 
     if opt.resume_path:
         print('loading checkpoint {}'.format(opt.resume_path))
-        checkpoint = torch.load(opt.resume_path)
+        checkpoint = torch.load(opt.resume_path,map_location='cpu')
         assert opt.arch == checkpoint['arch']
 
         opt.begin_epoch = checkpoint['epoch']
