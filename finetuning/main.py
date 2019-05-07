@@ -122,7 +122,7 @@ if __name__ == '__main__':
 
     if opt.resume_path:
         print('loading checkpoint {}'.format(opt.resume_path))
-        checkpoint = torch.load(opt.resume_path)
+        checkpoint = torch.load(opt.resume_path,map_location='cpu')
         assert opt.arch == checkpoint['arch']
 
         opt.begin_epoch = checkpoint['epoch']
