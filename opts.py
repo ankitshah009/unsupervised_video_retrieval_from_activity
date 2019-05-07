@@ -135,6 +135,11 @@ def parse_opts():
         type=int,
         help='Number of validation samples for each activity')
     parser.add_argument(
+        '--n_negatives',
+        default=1,
+        type=int,
+        help='Number of negatives to sample')
+    parser.add_argument(
         '--resume_path',
         default='',
         type=str,

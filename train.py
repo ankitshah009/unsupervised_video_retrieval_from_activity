@@ -19,7 +19,7 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
 
     end_time = time.time()
 
-    for i, (inputs, targets, anchor_inputs, positive_inputs, negative_inputs, negative_targets) in enumerate(data_loader):
+    for i, (inputs, targets, anchor_inputs, positive_inputs, negative_inputs) in enumerate(data_loader):
         data_time.update(time.time() - end_time)
         itr = (epoch - 1) * len(data_loader) + (i + 1)
 
@@ -33,12 +33,19 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
         margin = 0.5
         _, anchor_features = model(anchor_inputs)
         _, positive_features = model(positive_inputs)
-        _, negative_features = model(negative_inputs)
         anchor_features_normalized= (anchor_features/(torch.norm(anchor_features,p=2,dim=1).unsqueeze(1) + 1e-8))
         positive_features_normalized=  (positive_features/(torch.norm(positive_features,p=2,dim=1).unsqueeze(1) + 1e-8))
-        negative_features_normalized=  (negative_features/(torch.norm(negative_features,p=2,dim=1).unsqueeze(1) + 1e-8))
         distance_positive = (anchor_features_normalized - positive_features_normalized).pow(2).sum(1)  # .pow(.5)
-        distance_negative = (anchor_features_normalized - negative_features_normalized).pow(2).sum(1)  # .pow(.5)
+
+        negative_inputs = negative_inputs.transpose(0, 1)
+        negative_features_normalized = []
+        for neg in negative_inputs:
+            _, negative_features = model(neg)
+            negative_features_normalized.append(negative_features/(torch.norm(negative_features,p=2,dim=1).unsqueeze(1) + 1e-8))
+        negative_features_normalized = torch.stack(negative_features_normalized, dim=0)
+        distance_negative = torch.mean((anchor_features_normalized - negative_features_normalized), dim=0)
+        distance_negative = distance_negative.pow(2).sum(1)  # .pow(.5)
+
         triplet_losses = F.relu(distance_positive - distance_negative + margin)
         triplet_loss = triplet_losses.mean()
         
