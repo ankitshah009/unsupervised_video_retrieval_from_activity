@@ -1,3 +1,7 @@
+This is the repository for implementation of Unsupervised Video Representation using 3D convNets which is primarily geared towards understanding activities in videos. 
+
+We use the basecode from 3D ResNets for Action Recognition for this task. 
+
 # 3D ResNets for Action Recognition
 
 ## Update (2018/2/21)
