@@ -2,6 +2,32 @@ This is the repository for implementation of Unsupervised Video Representation u
 
 We use the basecode from 3D ResNets for Action Recognition for this task. 
 
+Commands to run the codebase 
+
+### Training of the Triplets 
+
+CUDA_VISIBLE_DEVICES=0,1,2,3 python main.py --root_path ./data --video_path ucf/jpg --annotation_path ucf/ucf101_01.json \
+--result_path ucf/results_triplet --dataset ucf101 --n_classes 101 --model resnext \
+--model_depth 101 --resnet_shortcut B --resnext_cardinality 32 --sample_duration 64 --batch_size 16 \
+--n_threads 32 --checkpoint 5 --n_epochs 400 \
+
+CUDA_VISIBLE_DEVICES=1,2,3 python main.py --root_path ./data --video_path hmdb/jpg --annotation_path hmdb/hmdb51_1.json \
+--result_path hmdb/results_triplet_scratch --dataset hmdb51 --n_classes 51 --model resnext \
+--model_depth 101 --resnet_shortcut B --resnext_cardinality 32 --sample_duration 64 --batch_size 10 \
+--n_negatives 4 --n_threads 32 --checkpoint 5 --n_epochs 250 --no_val \
+
+### Finetuning of the triplets
+
+CUDA_VISIBLE_DEVICES=1,2,3 python main.py --root_path ./../data --video_path hmdb/jpg --annotation_path hmdb/hmdb51_1.json \
+--result_path hmdb/results_triplet_finetuned --dataset hmdb51 --n_classes 51 --n_finetune_classes 51 --model resnext \
+--model_depth 101 --resnet_shortcut B --resnext_cardinality 32 --sample_duration 64 --batch_size 16 --resume_path hmdb/results_triplet_scratch/save_40.pth --ft_begin_index 4 --n_threads 64 --checkpoint 5 \
+--n_epochs 200 \
+
+CUDA_VISIBLE_DEVICES=0,1,2,3 python main.py --root_path ./../data --video_path hmdb/jpg --annotation_path hmdb/hmdb51_1.json \
+--result_path hmdb/results_scratch --dataset hmdb51 --n_classes 400 --n_finetune_classes 51 --model resnext \
+--model_depth 101 --resnet_shortcut B --resnext_cardinality 32 --sample_duration 64 --batch_size 32 --pretrain_path kinetics/resnext-101-64f-kinetics.pth --ft_begin_index 4 --n_threads 32 --checkpoint 5 \
+--n_epochs 200 \
+
 # 3D ResNets for Action Recognition
 
 ## Update (2018/2/21)
